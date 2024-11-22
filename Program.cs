@@ -2,7 +2,7 @@
 using System.IO;
 using SkiaSharp;
 
-namespace LfsrCipher
+namespace Lfsr
 {
     class Program
     {
@@ -149,7 +149,7 @@ namespace LfsrCipher
 
         static void DecryptImage(string imagePath, string seed, int tap)
         {
-            ProcessImage(imagePath, seed, tap, "NEW"); // The decrpyted image filename
+            ProcessImage(imagePath, seed, tap, "NEW"); // The decrypted image filename
         }
 
         static void ProcessImage(string imagePath, string seed, int tap, string outputSuffix)
@@ -184,10 +184,15 @@ namespace LfsrCipher
 
         static string Xor(string input, string keystream)
         {
-            char[] result = new char[input.Length];
-            int keystreamLength = keystream.Length;
-            for (int i = 0; i < input.Length; i++)
-                result[i] = input[i] == keystream[i % keystreamLength] ? '0' : '1';
+            // Pad the shorter string with zeros
+            int maxLength = Math.Max(input.Length, keystream.Length);
+            string paddedInput = input.PadLeft(maxLength, '0');
+            string paddedKeystream = keystream.PadLeft(maxLength, '0');
+
+            char[] result = new char[maxLength];
+            for (int i = 0; i < maxLength; i++)
+                result[i] = paddedInput[i] == paddedKeystream[i] ? '0' : '1';
+
             return new string(result);
         }
     }
