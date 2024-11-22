@@ -666,11 +666,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Itzpa\\Downloads\\LfsrCipher\\LfsrCipher.csproj",
-      "projectName": "LfsrCipher",
-      "projectPath": "C:\\Users\\Itzpa\\Downloads\\LfsrCipher\\LfsrCipher.csproj",
+      "projectUniqueName": "C:\\Users\\Itzpa\\Downloads\\project3\\Lfsr.csproj",
+      "projectName": "Lfsr",
+      "projectPath": "C:\\Users\\Itzpa\\Downloads\\project3\\Lfsr.csproj",
       "packagesPath": "C:\\Users\\Itzpa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Itzpa\\Downloads\\LfsrCipher\\obj\\",
+      "outputPath": "C:\\Users\\Itzpa\\Downloads\\project3\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Itzpa\\AppData\\Roaming\\NuGet\\NuGet.Config"

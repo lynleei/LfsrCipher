@@ -44,6 +44,13 @@ namespace LfsrCipher
                         Decrypt(args[1]);
                     break;
 
+                case "multiplebits":
+                    if (args.Length != 5)
+                        Console.WriteLine("Usage: dotnet run multiplebits <seed> <tap> <step> <iteration>");
+                    else
+                        MultipleBits(args[1], int.Parse(args[2]), int.Parse(args[3]), int.Parse(args[4]));
+                    break;
+
                 case "encryptimage":
                     if (args.Length != 4)
                         Console.WriteLine("Usage: dotnet run encryptimage <imagefile> <seed> <tap>");
@@ -72,22 +79,26 @@ namespace LfsrCipher
             Console.WriteLine("  generatekeystream <seed> <tap> <steps>");
             Console.WriteLine("  encrypt <plaintext>");
             Console.WriteLine("  decrypt <ciphertext>");
+            Console.WriteLine("  multiplebits <seed> <tap> <step> <iteration>");
             Console.WriteLine("  encryptimage <imagefile> <seed> <tap>");
             Console.WriteLine("  decryptimage <imagefile> <seed> <tap>");
         }
 
         static void Cipher(string seed, int tap)
         {
+            Console.WriteLine($"{seed} – seed");
             var lfsr = new Lfsr(seed, tap);
-            Console.WriteLine($"New Seed: {lfsr.Shift()}, Rightmost Bit: {lfsr.RightmostBit}");
+            lfsr.Shift();
+            Console.WriteLine($"{lfsr.Seed} {lfsr.RightmostBit}");
         }
 
         static void GenerateKeystream(string seed, int tap, int steps)
         {
             var lfsr = new Lfsr(seed, tap);
+            Console.WriteLine($"{seed} – seed");
             string keystream = lfsr.GenerateKeystream(steps);
             File.WriteAllText("keystream.txt", keystream);
-            Console.WriteLine($"Keystream saved: {keystream}");
+            Console.WriteLine($"The Keystream: {keystream}");
         }
 
         static void Encrypt(string plaintext)
@@ -98,7 +109,8 @@ namespace LfsrCipher
                 return;
             }
             string keystream = File.ReadAllText("keystream.txt");
-            Console.WriteLine($"Ciphertext: {Xor(plaintext, keystream)}");
+            string ciphertext = Xor(plaintext, keystream);
+            Console.WriteLine($"The ciphertext is: {ciphertext}");
         }
 
         static void Decrypt(string ciphertext)
@@ -109,42 +121,73 @@ namespace LfsrCipher
                 return;
             }
             string keystream = File.ReadAllText("keystream.txt");
-            Console.WriteLine($"Plaintext: {Xor(ciphertext, keystream)}");
+            string plaintext = Xor(ciphertext, keystream);
+            Console.WriteLine($"The plaintext is: {plaintext}");
+        }
+
+        static void MultipleBits(string seed, int tap, int steps, int iterations)
+        {
+            Console.WriteLine($"{seed} - seed");
+            for (int i = 0; i < iterations; i++)
+            {
+                var lfsr = new Lfsr(seed, tap);
+                int accumulatedValue = 0;
+                for (int j = 0; j < steps; j++)
+                {
+                    lfsr.Shift();
+                    accumulatedValue = accumulatedValue * 2 + lfsr.RightmostBit;
+                }
+                Console.WriteLine($"{lfsr.Seed} {accumulatedValue}");
+                seed = lfsr.Seed; // Use the new seed for the next iteration
+            }
         }
 
         static void EncryptImage(string imagePath, string seed, int tap)
         {
-            ProcessImage(imagePath, seed, tap, "ENCRYPTED.png");
+            ProcessImage(imagePath, seed, tap, "ENCRYPTED"); // The encrypted image filename
         }
 
         static void DecryptImage(string imagePath, string seed, int tap)
         {
-            ProcessImage(imagePath, seed, tap, "DECRYPTED.png");
+            ProcessImage(imagePath, seed, tap, "NEW"); // The decrpyted image filename
         }
 
         static void ProcessImage(string imagePath, string seed, int tap, string outputSuffix)
         {
             var lfsr = new Lfsr(seed, tap);
             using var bitmap = SKBitmap.Decode(imagePath);
+
+            if (bitmap == null)
+            {
+                Console.WriteLine($"Error: Unable to load image from path '{imagePath}'.");
+                return;
+            }
+
             for (int y = 0; y < bitmap.Height; y++)
             {
                 for (int x = 0; x < bitmap.Width; x++)
                 {
                     var pixel = bitmap.GetPixel(x, y);
-                    int newRed = pixel.Red ^ lfsr.ShiftRandomByte();
-                    int newGreen = pixel.Green ^ lfsr.ShiftRandomByte();
-                    int newBlue = pixel.Blue ^ lfsr.ShiftRandomByte();
-                    bitmap.SetPixel(x, y, new SKColor((byte)newRed, (byte)newGreen, (byte)newBlue));
+                    byte newRed = (byte)(pixel.Red ^ lfsr.ShiftRandomByte());
+                    byte newGreen = (byte)(pixel.Green ^ lfsr.ShiftRandomByte());
+                    byte newBlue = (byte)(pixel.Blue ^ lfsr.ShiftRandomByte());
+                    bitmap.SetPixel(x, y, new SKColor(newRed, newGreen, newBlue));
                 }
             }
-            bitmap.Encode(new FileStream(Path.GetFileNameWithoutExtension(imagePath) + outputSuffix, FileMode.Create), SKEncodedImageFormat.Png, 100);
+
+            string outputFileName = Path.GetFileNameWithoutExtension(imagePath) + outputSuffix + ".png";
+            string outputFilePath = Path.Combine(Path.GetDirectoryName(imagePath), outputFileName);
+
+            using var stream = File.Create(outputFilePath);
+            bitmap.Encode(stream, SKEncodedImageFormat.Png, 100);
         }
 
         static string Xor(string input, string keystream)
         {
             char[] result = new char[input.Length];
+            int keystreamLength = keystream.Length;
             for (int i = 0; i < input.Length; i++)
-                result[i] = input[i] == keystream[i] ? '0' : '1';
+                result[i] = input[i] == keystream[i % keystreamLength] ? '0' : '1';
             return new string(result);
         }
     }
@@ -154,6 +197,7 @@ namespace LfsrCipher
         private string seed;
         private int tap;
 
+        public string Seed => seed;
         public int RightmostBit { get; private set; }
 
         public Lfsr(string seed, int tap)
@@ -162,14 +206,14 @@ namespace LfsrCipher
             this.tap = tap;
         }
 
-        public string Shift()
+        public void Shift()
         {
-            int bit1 = seed[0] - '0';
-            int bit2 = seed[tap] - '0';
-            int newBit = bit1 ^ bit2;
-            RightmostBit = seed[^1] - '0';
-            seed = seed.Substring(1) + newBit;
-            return seed;
+            int shiftedOffBit = seed[0] - '0';
+            int tapIndex = seed.Length - tap; // Adjust tap position
+            int tapBit = seed[tapIndex] - '0';
+            int newBit = shiftedOffBit ^ tapBit;
+            seed = seed.Substring(1) + newBit.ToString();
+            RightmostBit = newBit;
         }
 
         public string GenerateKeystream(int steps)
@@ -179,14 +223,20 @@ namespace LfsrCipher
             {
                 Shift();
                 keystream += RightmostBit;
+                Console.WriteLine($"{seed} {RightmostBit}");
             }
             return keystream;
         }
 
         public int ShiftRandomByte()
         {
-            Shift();
-            return Convert.ToInt32(GenerateKeystream(8), 2);
+            int value = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                Shift();
+                value = (value << 1) | RightmostBit;
+            }
+            return value;
         }
     }
 }

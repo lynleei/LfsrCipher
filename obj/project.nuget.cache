@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fFEY04p5epg=",
+  "dgSpecHash": "q03YgVI++a8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Itzpa\\Downloads\\LfsrCipher\\LfsrCipher.csproj",
+  "projectFilePath": "C:\\Users\\Itzpa\\Downloads\\project3\\Lfsr.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Itzpa\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.9\\microsoft.netcore.platforms.3.1.9.nupkg.sha512",
     "C:\\Users\\Itzpa\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
