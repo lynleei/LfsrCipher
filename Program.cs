@@ -5,6 +5,27 @@
 ///
 /// A program to implement encryption, decryption, and image processing using an LFSR-based stream cipher.
 ///
+/// Usage:
+/// dotnet run <option> <arguments>
+/// 
+/// Options:
+///   cipher <seed> <tap>                               - Simulate one step of the LFSR.
+///   generatekeystream <seed> <tap> <steps>            - Generate a keystream and save it to a file.
+///   encrypt <plaintext>                               - Encrypt plaintext using the keystream.
+///   decrypt <ciphertext>                              - Decrypt ciphertext using the keystream.
+///   multiplebits <seed> <tap> <step> <iteration>      - Perform multiple LFSR steps and calculations.
+///   encryptimage <imagefile> <seed> <tap>             - Encrypt an image file.
+///   decryptimage <imagefile> <seed> <tap>             - Decrypt an image file.
+///
+/// Example Runs:
+///     dotnet run generatekeystream 01101000010 9 10
+///     dotnet run encrypt 1010101010
+///     dotnet run decrypt 1100110011
+///     dotnet run cipher 01101000010 9
+///     dotnet run multiplebits 01101000010 9 5 3
+///     dotnet run encryptimage image.png 01101000010 9
+///     dotnet run decryptimage imageENCRYPTED.png 01101000010 9
+/// 
 /// @author Lynlee Hong
 /// </summary>
 

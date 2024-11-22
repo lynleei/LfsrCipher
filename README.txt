@@ -1,3 +1,35 @@
+Project Overview
+
+This project implements a stream cipher using a Linear Feedback Shift Register (LFSR) to encrypt and decrypt data. It demonstrates the principles of symmetric key cryptography with LFSR as the core pseudorandom bit generator. The project is implemented as a .NET command-line application and includes functionality to:
+
+    - Generate a keystream using the LFSR.
+    
+    - Encrypt plaintext using the generated keystream.
+    
+    - Decrypt ciphertext to retrieve the original plaintext.
+    
+    - Encrypt and decrypt images by applying XOR operations to pixel values.
+    
+    - Perform multiple iterations of LFSR operations for testing and evaluation.
+
+The LFSR generates a pseudorandom sequence based on an initial seed and tap position, 
+which ensures the security and correctness of the cipher. 
+The XOR-based encryption ensures lightweight and fast processing while maintaining confidentiality.
+--------------------------------------------------------------------------------------------------------------------
+
+Features
+
+    - LFSR Simulation: Step-by-step simulation of the LFSR to understand its functionality.
+    
+    - Keystream Generation: Generate pseudorandom bitstreams for encryption.
+    
+    - Text Encryption and Decryption: Perform encryption and decryption of binary plaintext and ciphertext.
+    
+    - Image Processing: Encrypt and decrypt image files, preserving their structure while ensuring confidentiality.
+    
+    - Command-Line Interface: User-friendly CLI to run the program with various options.
+--------------------------------------------------------------------------------------------------------------------
+
 Sample Runs with Outputs:
 
 cipher:
@@ -66,5 +98,17 @@ multiplebits:
     01100010111 23
     01011111101 29
 
-    dotnet run encryptimage image.png 01101000010 9
+Image encryption and decryption:
+    dotnet run encryptimage image.jpg 01101000010 9
+    -> saved as imageENCRYPTED.png
+
     dotnet run decryptimage imageENCRYPTED.png 01101000010 9
+    -> saved as imageENCRYPTEDNEW.png
+--------------------------------------------------------------------------------------------------------------------
+
+Notes:
+All generated image files are saved as .png.
+
+Supports encryption and decryption for .jpg, .jpeg, and .png formats.
+
+Images used for testing are from artist WLOP
