@@ -1,9 +1,23 @@
-﻿using System;
+﻿/// <summary>
+/// Concepts of Parallel and Distributed Systems CSCI-251
+///
+/// Project 3: Stream Cipher-Linear Feedback Shift Registers (LFSR)
+///
+/// A program to implement encryption, decryption, and image processing using an LFSR-based stream cipher.
+///
+/// @author Lynlee Hong
+/// </summary>
+
+using System;
 using System.IO;
 using SkiaSharp;
 
 namespace Lfsr
 {
+    /// <summary>
+    /// Main Program class to handle user input and manage operations such as encryption, decryption, 
+    /// keystream generation, and image processing.
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
@@ -71,6 +85,9 @@ namespace Lfsr
             }
         }
 
+        /// <summary>
+        /// Displays the help menu with usage instructions.
+        /// </summary>
         static void ShowHelp()
         {
             Console.WriteLine("Usage: dotnet run <option> <arguments>");
@@ -84,6 +101,9 @@ namespace Lfsr
             Console.WriteLine("  decryptimage <imagefile> <seed> <tap>");
         }
 
+        /// <summary>
+        /// Performs a single LFSR step and outputs the new seed and rightmost bit.
+        /// </summary>
         static void Cipher(string seed, int tap)
         {
             Console.WriteLine($"{seed} – seed");
@@ -92,6 +112,9 @@ namespace Lfsr
             Console.WriteLine($"{lfsr.Seed} {lfsr.RightmostBit}");
         }
 
+        /// <summary>
+        /// Generates a keystream of the specified length and saves it to a file.
+        /// </summary>
         static void GenerateKeystream(string seed, int tap, int steps)
         {
             var lfsr = new Lfsr(seed, tap);
@@ -101,6 +124,9 @@ namespace Lfsr
             Console.WriteLine($"The Keystream: {keystream}");
         }
 
+        /// <summary>
+        /// Encrypts plaintext using the keystream stored in a file.
+        /// </summary>
         static void Encrypt(string plaintext)
         {
             if (!File.Exists("keystream.txt"))
@@ -113,6 +139,9 @@ namespace Lfsr
             Console.WriteLine($"The ciphertext is: {ciphertext}");
         }
 
+        /// <summary>
+        /// Decrypts plaintext using the keystream stored in file.
+        /// </summary>
         static void Decrypt(string ciphertext)
         {
             if (!File.Exists("keystream.txt"))
@@ -125,6 +154,9 @@ namespace Lfsr
             Console.WriteLine($"The plaintext is: {plaintext}");
         }
 
+        /// <summary>
+        /// Performs multiple iterations of LFSR steps and prints the accumulated results.
+        /// </summary>
         static void MultipleBits(string seed, int tap, int steps, int iterations)
         {
             Console.WriteLine($"{seed} - seed");
@@ -142,16 +174,25 @@ namespace Lfsr
             }
         }
 
+        /// <summary>
+        /// Encrypts an image file using the LFSR-based stream cipher.
+        /// </summary>
         static void EncryptImage(string imagePath, string seed, int tap)
         {
             ProcessImage(imagePath, seed, tap, "ENCRYPTED"); // The encrypted image filename
         }
 
+        /// <summary>
+        /// Decrypts an image file using the LFSR-based stream cipher.
+        /// </summary>
         static void DecryptImage(string imagePath, string seed, int tap)
         {
             ProcessImage(imagePath, seed, tap, "NEW"); // The decrypted image filename
         }
 
+        /// <summary>
+        /// Processes an image file (encrypt or decrypt) by applying the LFSR cipher to each pixel.
+        /// </summary>
         static void ProcessImage(string imagePath, string seed, int tap, string outputSuffix)
         {
             var lfsr = new Lfsr(seed, tap);
@@ -182,12 +223,15 @@ namespace Lfsr
             bitmap.Encode(stream, SKEncodedImageFormat.Png, 100);
         }
 
+        /// <summary>
+        /// Performs a bitwise XOR operation between two binary strings.
+        /// </summary>
         static string Xor(string input, string keystream)
         {
             // Pad the shorter string with zeros
             int maxLength = Math.Max(input.Length, keystream.Length);
-            string paddedInput = input.PadLeft(maxLength, '0');
-            string paddedKeystream = keystream.PadLeft(maxLength, '0');
+            string paddedInput = input.PadLeft(maxLength, '0'); // plaintext is shorter than the keystream, pad the keystream to the left with zeros
+            string paddedKeystream = keystream.PadLeft(maxLength, '0'); // keystream is shorter than the plaintext, pad the keystream to the left with zeros
 
             char[] result = new char[maxLength];
             for (int i = 0; i < maxLength; i++)
@@ -197,6 +241,9 @@ namespace Lfsr
         }
     }
 
+    /// <summary>
+    /// Implements a Linear Feedback Shift Register (LFSR) for generating pseudorandom sequences.
+    /// </summary>
     class Lfsr
     {
         private string seed;
